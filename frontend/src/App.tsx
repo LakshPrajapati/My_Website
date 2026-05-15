@@ -10,9 +10,12 @@ import { AnimatePresence } from 'framer-motion';
 const Portfolio = lazy(() => import('./components/Portfolio'));
 const LoginGateway = lazy(() => import('./components/auth/LoginGateway'));
 
+const routerBasename =
+  import.meta.env.BASE_URL.replace(/\/$/, '') || undefined;
+
 const AppContent: React.FC = () => {
   return (
-    <Router>
+    <Router basename={routerBasename}>
       <SmoothScroll>
         <AnimatePresence mode="wait">
           <Suspense fallback={

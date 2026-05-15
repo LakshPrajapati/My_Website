@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base HUD styling & Utilities */
+.scanline-overlay {
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 0, 0, 0.25) 51%
+  );
+  background-size: 100% 4px;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.03; /* Drastically reduced scanline opacity */
+}
+
+/* Custom Scrollbar for intelligence look */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #050816;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.3);
+}
+
+/* Lenis Recommended CSS */
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@layer utilities {
+  .text-gradient-elite {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-elite-cyan/40;
+    display: inline-block;
+  }
+
+  .module-bg-number {
+    @apply absolute select-none pointer-events-none font-bold;
+    font-family: theme('fontFamily.display');
+    left: -20px;
+    top: -60px;
+    font-size: clamp(160px, 18vw, 280px);
+    opacity: 0.02;
+    z-index: 0;
+    filter: blur(2px);
+    line-height: 0.8;
+  }
+
+  .section-title-container {
+    @apply relative overflow-hidden inline-block py-2;
+  }
+
+  .section-title {
+    @apply relative z-10 transition-all duration-500 ease-out;
+    will-change: transform, letter-spacing, text-shadow;
+  }
+
+  .section-title:hover {
+    @apply tracking-tight;
+    transform: translateY(-2px);
+    text-shadow: 
+      0 0 15px rgba(0, 240, 255, 0.2),
+      0 0 30px rgba(0, 180, 255, 0.1);
+  }
+
+  .title-sweep {
+    @apply absolute inset-0 z-20 pointer-events-none;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(0, 240, 255, 0.15),
+      transparent
+    );
+    transform: translateX(-100%);
+    transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .section-title-container:hover .title-sweep {
+    transform: translateX(100%);
+  }
+
+  .active-scan-line {
+    @apply absolute bottom-0 left-0 h-[1px] bg-elite-cyan/30 w-0 transition-all duration-1000 ease-out;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+  }
+
+  .section-title-container:hover .active-scan-line {
+    @apply w-full;
+  }
+}
+
+/* Depth & Atmosphere */
+.vignette-overlay {
+  background: radial-gradient(circle at center, transparent 0%, rgba(3, 5, 10, 0.4) 100%);
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.noise-texture {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.02;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}

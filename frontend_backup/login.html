@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login – Laksh Prajapati Portfolio</title>
+    <meta name="description" content="Secure login to access the portfolio of Laksh Prajapati.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          crossorigin="anonymous" referrerpolicy="no-referrer"
+          onerror="this.onerror=null;this.href='https://unpkg.com/@fortawesome/fontawesome-free@6.5.1/css/all.min.css'">
+</head>
+<body class="login-body">
+
+    <!-- Custom Cursor -->
+    <div id="cursor-dot" class="cursor-dot"></div>
+    <div id="cursor-ring" class="cursor-ring"></div>
+
+    <!-- Galaxy Background -->
+    <canvas id="galaxy-canvas"></canvas>
+
+    <!-- Login Card -->
+    <div class="login-container glassmorphism">
+        <div class="login-logo">LP.</div>
+        <h2>Welcome Back</h2>
+        <p>Enter your credentials to access the portfolio.</p>
+
+        <form id="login-form" autocomplete="off" novalidate>
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="email" placeholder="University Email" required autocomplete="off" spellcheck="false">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" placeholder="Password" required autocomplete="new-password">
+            </div>
+            <p id="error-msg">
+                <i class="fa-solid fa-circle-exclamation"></i>&nbsp;Invalid credentials. Please try again.
+            </p>
+            <button type="submit" class="btn" id="login-btn">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i>&nbsp; Login
+            </button>
+        </form>
+    </div>
+
+    <!-- Auth Script (inline, runs before anything else) -->
+    <script>
+        // If already logged in, skip login page
+        if (sessionStorage.getItem('loggedIn') === 'true') {
+            window.location.replace('index.html');
+        }
+
+        const VALID_EMAIL = 'laksh.prajapati2025@lpu.in';
+        const VALID_PWD   = '021206';
+        let attempts = 0;
+
+        document.getElementById('login-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const emailVal = document.getElementById('email').value.trim();
+            const pwdVal   = document.getElementById('password').value;
+            const errEl    = document.getElementById('error-msg');
+            const btn      = document.getElementById('login-btn');
+
+            // Rate-limit: disable button briefly after failed attempts
+            if (attempts >= 3) {
+                errEl.style.display = 'block';
+                errEl.innerHTML = '<i class="fa-solid fa-ban"></i>&nbsp;Too many attempts. Wait a moment.';
+                btn.disabled = true;
+                setTimeout(() => {
+                    btn.disabled = false;
+                    attempts = 0;
+                    errEl.style.display = 'none';
+                }, 8000);
+                return;
+            }
+
+            if (emailVal === VALID_EMAIL && pwdVal === VALID_PWD) {
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>&nbsp; Logging in...';
+                btn.disabled = true;
+                sessionStorage.setItem('loggedIn', 'true');
+                setTimeout(() => { window.location.replace('index.html'); }, 700);
+            } else {
+                attempts++;
+                errEl.style.display = 'block';
+                // Shake animation on card
+                const card = document.querySelector('.login-container');
+                card.style.animation = 'none';
+                card.offsetHeight; // reflow
+                card.style.animation = 'shake 0.4s ease';
+            }
+        });
+    </script>
+
+    <!-- Shake keyframe & Galaxy -->
+    <style>
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            20%      { transform: translateX(-8px); }
+            40%      { transform: translateX(8px); }
+            60%      { transform: translateX(-5px); }
+            80%      { transform: translateX(5px); }
+        }
+    </style>
+
+    <script src="script.js"></script>
+</body>
+</html>

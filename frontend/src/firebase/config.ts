@@ -31,10 +31,15 @@ export const db = getFirestore(app);
 
 // Initialize App Check
 if (typeof window !== 'undefined' && env.VITE_RECAPTCHA_SITE_KEY) {
-  initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider(env.VITE_RECAPTCHA_SITE_KEY),
-    isTokenAutoRefreshEnabled: true
-  });
+  try {
+    initializeAppCheck(app, {
+      provider: new ReCaptchaV3Provider(env.VITE_RECAPTCHA_SITE_KEY),
+      isTokenAutoRefreshEnabled: true
+    });
+    console.log('App Check initialized successfully');
+  } catch (error) {
+    console.warn('App Check failed to initialize:', error);
+  }
 }
 
 export default app;

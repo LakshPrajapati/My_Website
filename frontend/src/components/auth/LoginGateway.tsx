@@ -1,10 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Github, Chrome, Shield, Lock } from 'lucide-react';
 
 const LoginGateway: React.FC = () => {
-  const { signInWithGoogle, signInWithGithub } = useAuth();
+  const { user, signInWithGoogle, signInWithGithub, loading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (user && !loading) {
+      const from = (location.state as any)?.from?.pathname || '/';
+      navigate(from, { replace: true });
+    }
+  }, [user, loading, navigate, location]);
+
+  if (loading) return null;
 
   return (
     <div className="min-h-screen bg-[#03050a] flex items-center justify-center relative overflow-hidden px-4">

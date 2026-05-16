@@ -28,8 +28,14 @@ const rawEnv = {
 const _env = envSchema.safeParse(rawEnv);
 
 if (!_env.success) {
-  console.error('Invalid environment variables:', _env.error.format());
-  throw new Error('Invalid environment variables');
+  const formatted = _env.error.format();
+  console.error('Critical Error: Invalid or missing environment variables:', formatted);
+  
+  if (import.meta.env.PROD) {
+    console.error('ACTION REQUIRED: Ensure all required VITE_* variables are set in your hosting provider (Vercel, GitHub, Firebase).');
+  }
+  
+  throw new Error('Environment configuration failed. Check console for missing keys.');
 }
 
 export const env = _env.data;

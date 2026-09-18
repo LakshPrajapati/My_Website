@@ -1,6 +1,8 @@
 import express, { type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
+import type { Server } from 'node:http';
 import { env } from './config/env';
+import { connectToDatabase, disconnectFromDatabase } from './config/database';
 import { logger } from './utils/logger';
 import chatRoutes from './routes/chat.routes';
 
@@ -39,8 +41,55 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-app.listen(env.PORT, () => {
-  logger.system(`LAKSH.OS INTELLIGENCE KERNEL ONLINE`);
-  logger.system(`ACCESS POINT: http://localhost:${env.PORT}`);
-  logger.system(`ENVIRONMENT: ${env.NODE_ENV}`);
+let server: Server | undefined;
+let isShuttingDown = false;
+
+async function shutdown(signal: string): Promise<void> {
+  if (isShuttingDown) {
+    return;
+  }
+
+  isShuttingDown = true;
+  logger.info(`SHUTDOWN_SIGNAL_RECEIVED: ${signal}`);
+
+  try {
+    if (server) {
+      await new Promise<void>((resolve, reject) => {
+        server?.close((error) => (error ? reject(error) : resolve()));
+      });
+    }
+
+    await disconnectFromDatabase();
+    logger.success('SERVER_SHUTDOWN_COMPLETE');
+  } catch (error) {
+    logger.error('SERVER_SHUTDOWN_FAILED', {
+      errorType: error instanceof Error ? error.name : 'UnknownError',
+    });
+    process.exitCode = 1;
+  }
+}
+
+async function startServer(): Promise<void> {
+  await connectToDatabase();
+
+  server = app.listen(env.PORT, () => {
+    logger.system('LAKSH.OS INTELLIGENCE KERNEL ONLINE');
+    logger.system(`ACCESS POINT: http://localhost:${env.PORT}`);
+    logger.system(`ENVIRONMENT: ${env.NODE_ENV}`);
+  });
+}
+
+process.once('SIGINT', () => {
+  void shutdown('SIGINT');
+});
+
+process.once('SIGTERM', () => {
+  void shutdown('SIGTERM');
+});
+
+void startServer().catch((error: unknown) => {
+  logger.error('SERVER_STARTUP_FAILED', {
+    errorType: error instanceof Error ? error.name : 'UnknownError',
+  });
+  process.exitCode = 1;
 });

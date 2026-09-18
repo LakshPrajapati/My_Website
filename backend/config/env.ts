@@ -13,6 +13,8 @@ const envSchema = z.object({
   PORT: z.string().default("3001"),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   FRONTEND_URL: z.string().url().default("http://localhost:5174"),
+  MONGODB_URI: z.string().min(1, "MONGODB_URI is required"),
+  MONGODB_DB_NAME: z.string().min(1).default("smart-dukaan-khata"),
   RESEND_API_KEY: z.string().optional(),
   TO_EMAIL: z.string().email().optional(),
   FROM_EMAIL: z.string().optional(),
